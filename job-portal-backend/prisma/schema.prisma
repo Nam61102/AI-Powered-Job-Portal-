@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  name             String
+  email            String            @unique
+  password         String
+  role             String
+  id               Int               @id @default(autoincrement())
+  isBlocked        Boolean           @default(false)
+  applications     Application[]
+  candidateProfile CandidateProfile?
+  companies        Company[]
+  activities       Activity[]
+  notifications    Notification[]
+}
+
+model CandidateProfile {
+  skills          String
+  education       String
+  experience      Int
+  resumeUrl       String
+  resumeText      String?
+  workExperiences Json?
+  certifications  Json?
+  languages       Json?
+  socialLinks     Json?
+  bio             String?
+  profilePicture  String?
+  id              Int    @id @default(autoincrement())
+  userId          Int    @unique
+  user            User   @relation(fields: [userId], references: [id])
+}
+
+model Company {
+  companyName String
+  website     String
+  logo        String?
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  user        User    @relation(fields: [userId], references: [id])
+  jobs        Job[]
+}
+
+model Job {
+  title        String
+  description  String
+  skills       String?
+  salary       Int
+  location     String
+  createdAt    DateTime      @default(now())
+  id           Int           @id @default(autoincrement())
+  companyId    Int
+  applications Application[]
+  company      Company       @relation(fields: [companyId], references: [id])
+}
+
+model Application {
+  status      String
+  id          Int      @id @default(autoincrement())
+  jobId       Int
+  candidateId Int
+  createdAt   DateTime @default(now())
+  candidate   User     @relation(fields: [candidateId], references: [id])
+  job         Job      @relation(fields: [jobId], references: [id])
+  interview   Interview?
+}
+
+model Activity {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  type        String
+  createdAt   DateTime @default(now())
+  recruiterId Int
+  recruiter   User     @relation(fields: [recruiterId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+
+  receiverId Int
+  receiver   User @relation(fields: [receiverId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum InterviewMode {
+  ONLINE
+  OFFLINE
+}
+
+model Interview {
+  id            Int          @id @default(autoincrement())
+  applicationId Int          @unique
+  application   Application  @relation(fields: [applicationId], references: [id])
+  interviewDate DateTime
+  mode          InterviewMode
+  meetingLink   String?
+  address       String?
+  notes         String?
+  status        String       @default("SCHEDULED")
+  createdAt     DateTime     @default(now())
+}

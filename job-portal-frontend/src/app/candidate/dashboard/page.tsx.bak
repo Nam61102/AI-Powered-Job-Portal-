@@ -1,0 +1,174 @@
+"use client";
+
+import { useAuth } from "@/hooks/useAuth";
+import { useApplications } from "@/hooks/useApplications";
+import { useCandidate } from "@/hooks/useCandidate";
+import Link from "next/link";
+
+export default function CandidateDashboard() {
+  const { user } = useAuth();
+  const { applications, loading: appsLoading } = useApplications();
+  const { profile, loading: profileLoading } = useCandidate();
+
+  // Dynamic profile completion percentage calculation
+  const completionPercentage = (() => {
+    let score = 0;
+    if (user?.name) score += 20;
+    if (profile?.skills && profile.skills.trim()) score += 20;
+    if (profile?.education && profile.education.trim()) score += 20;
+    if (profile?.experience !== undefined && profile.experience !== null && profile.experience > 0) score += 20;
+    if (profile?.resumeUrl && profile.resumeUrl.trim()) score += 20;
+    return score;
+  })();
+
+  const recentAppsCount = applications.length;
+
+  return (
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* Welcome Header Banner Card */}
+      <div className="bg-[#0f1b2d] rounded-2xl p-6 md:p-8 text-white flex flex-col md:flex-row items-start md:items-center justify-between shadow-sm relative overflow-hidden">
+        <div className="space-y-2 z-10">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Welcome back, {user?.name?.split(" ")[0] || "Candidate"}!
+          </h1>
+          <p className="text-sm text-slate-300">
+            {recentAppsCount > 0 
+              ? `You have applied to ${recentAppsCount} job${recentAppsCount > 1 ? "s" : ""} so far.` 
+              : "You haven't applied to any jobs yet. Start exploring opportunities!"}
+          </p>
+        </div>
+        
+        <div className="w-full md:w-64 mt-6 md:mt-0 p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm z-10">
+          <div className="flex items-center justify-between text-xs font-semibold mb-2">
+            <span className="text-slate-300">Profile Completion</span>
+            <span className="text-white">
+              {profileLoading ? "..." : `${completionPercentage}%`}
+            </span>
+          </div>
+          <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
+            <div 
+              className="bg-blue-500 h-full rounded-full transition-all duration-500" 
+              style={{ width: `${profileLoading ? 0 : completionPercentage}%` }}
+            ></div>
+          </div>
+          <span className="text-[10px] text-slate-400 mt-2 block">
+            {completionPercentage === 100 
+              ? "Profile is fully complete!" 
+              : "Complete all fields on your profile page to reach 100%"}
+          </span>
+        </div>
+      </div>
+
+      {/* Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+              ✉️
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-slate-400">Applied Jobs</div>
+            <div className="text-3xl font-extrabold text-slate-900 mt-2">
+              {appsLoading ? "..." : applications.length}
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+              🔖
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-slate-400">Saved Jobs</div>
+            <div className="text-3xl font-extrabold text-slate-900 mt-2">8</div>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+              📅
+            </div>
+          </div>
+          <div className="mt-4">
+            <div className="text-xs font-semibold text-slate-400">Interviews</div>
+            <div className="text-3xl font-extrabold text-slate-900 mt-2">3</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Applications */}
+      <div className="bg-white rounded-xl border border-slate-200/80 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-bold text-slate-800">Recent Applications</h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <th className="pb-3 font-semibold">Company</th>
+                <th className="pb-3 font-semibold">Role</th>
+                <th className="pb-3 font-semibold">Date Applied</th>
+                <th className="pb-3 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-xs text-slate-600">
+              {appsLoading ? (
+                Array.from({ length: 3 }).map((_, idx) => (
+                  <tr key={idx} className="animate-pulse">
+                    <td className="py-4">
+                      <div className="h-4 w-24 bg-slate-200 rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-32 bg-slate-200 rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-16 bg-slate-200 rounded"></div>
+                    </td>
+                    <td className="py-4">
+                      <div className="h-4 w-16 bg-slate-200 rounded"></div>
+                    </td>
+                  </tr>
+                ))
+              ) : applications.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-slate-400 font-medium">
+                    No applications yet.
+                  </td>
+                </tr>
+              ) : (
+                applications.slice(0, 3).map((app) => (
+                  <tr key={app.id} className="hover:bg-slate-50">
+                    <td className="py-4 font-bold text-slate-800">{app.job.company.companyName}</td>
+                    <td className="py-4 font-medium text-slate-700">{app.job.title}</td>
+                    <td className="py-4">
+                      {new Date(app.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                      })}
+                    </td>
+                    <td className="py-4">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase bg-blue-50 text-blue-600">
+                        {app.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="text-center pt-5 border-t border-slate-100 mt-4">
+          <Link href="/candidate/applications" className="text-xs font-bold text-blue-600 hover:text-blue-700">
+            View all applications
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
