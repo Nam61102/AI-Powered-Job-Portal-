@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Ensures node version is correct if Netlify defaults to older versions
+  NODE_VERSION = "20"
