@@ -2,6 +2,7 @@ import React from "react";
 import { Job } from "@/types/job";
 import ApplyButton from "./ApplyButton";
 import { getJobType, getJobExperience } from "@/hooks/useJobs";
+import ResumeMatchButton from "../ai/ResumeMatchButton";
 
 interface JobDetailsCardProps {
   job: Job;
@@ -95,7 +96,8 @@ export default function JobDetailsCard({
           </div>
         </div>
 
-        <div className="flex-shrink-0 w-full md:w-auto">
+        <div className="flex-shrink-0 w-full md:w-auto flex flex-col sm:flex-row gap-3">
+          <ResumeMatchButton jobId={job.id} />
           <ApplyButton
             hasApplied={hasApplied}
             applyLoading={applyLoading}
