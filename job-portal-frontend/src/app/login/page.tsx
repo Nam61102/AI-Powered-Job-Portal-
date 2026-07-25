@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
+
+
 export default function LoginPage() {
   const router = useRouter();
   const { login, loading, error } = useAuth();
