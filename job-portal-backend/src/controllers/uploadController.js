@@ -1,7 +1,7 @@
 const uploadToCloudinary = require("../utils/uploadToCloudinary");
 const prisma = require("../config/prisma");
 const { createActivity } = require("../services/activity.service");
-const pdf = require("pdf-parse");
+const { PDFParse } = require("pdf-parse");
 
 // Upload Resume
 exports.uploadResume = async (req, res) => {
@@ -12,7 +12,8 @@ exports.uploadResume = async (req, res) => {
 
     let resumeText = null;
     try {
-      const data = await pdf(req.file.buffer);
+      const parser = new PDFParse({ data: req.file.buffer });
+      const data = await parser.getText();
       resumeText = data.text;
     } catch (e) {
       console.error("Failed to parse PDF:", e);

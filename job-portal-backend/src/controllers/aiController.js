@@ -24,16 +24,11 @@ const resumeMatch = async (req, res) => {
       });
     }
 
-    // 4. Call the service to fetch candidate and job data
-    // No Prisma queries are written here, maintaining clean architecture
-    const { candidate, job } = await getResumeMatchData(userId, jobId);
+    // 4. Call the service to perform resume matching via Gemini AI
+    const serviceResponse = await getResumeMatchData(userId, jobId);
 
-    // 5. Return the expected success response with both candidate and job objects
-    return res.status(200).json({
-      success: true,
-      candidate,
-      job
-    });
+    // 5. Return the structured JSON response
+    return res.status(200).json(serviceResponse);
   } catch (error) {
     console.error("Error in resumeMatch:", error);
     
