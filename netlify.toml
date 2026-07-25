@@ -1,5 +1,0 @@
-# Root Netlify configuration file
-# This tells Netlify to build the frontend located in the job-portal-frontend subdirectory.
-
-[build]
-  base = "job-portal-frontend"
