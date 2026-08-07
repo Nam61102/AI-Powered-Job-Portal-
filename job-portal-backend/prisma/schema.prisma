@@ -19,6 +19,8 @@ model User {
   companies        Company[]
   activities       Activity[]
   notifications    Notification[]
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 }
 
 model CandidateProfile {
@@ -111,4 +113,16 @@ model Interview {
   notes         String?
   status        String       @default("SCHEDULED")
   createdAt     DateTime     @default(now())
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  senderId   Int
+  receiverId Int
+  message    String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }

@@ -2,8 +2,14 @@ require("dotenv").config();
 console.log(process.env.GEMINI_API_KEY);
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
+const { initSocket } = require("./socket/socket");
 
 const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+initSocket(server);
 
 // IMPORT ROUTES
 const jobRoutes = require("./routes/jobRoutes");
@@ -18,6 +24,7 @@ const analyticsRoutes = require("./routes/analyticsRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const interviewRoutes = require("./routes/interviewRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const chatRoutes = require("./routes/chat.routes");
 
 app.use(cors());
 app.use(express.json());
@@ -35,6 +42,7 @@ app.use("/api/recruiter", analyticsRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/interviews", interviewRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/chat", chatRoutes);
 
 app.get("/", (req, res) => {
   res.send("Job Portal Backend Running");
@@ -42,6 +50,6 @@ app.get("/", (req, res) => {
 
 const PORT = 5000;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
